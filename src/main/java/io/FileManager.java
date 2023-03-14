@@ -6,6 +6,8 @@ import stored.LabWork;
 import javax.swing.plaf.basic.BasicTreeUI;
 import javax.xml.bind.*;
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Class for working with a file that stores a collection.
@@ -66,8 +68,10 @@ public class FileManager {
             JAXBContext context = JAXBContext.newInstance(CollectionManager.class);
             Unmarshaller um = context.createUnmarshaller();
             um.unmarshal(sr);
+            Set<Long> idSet = new HashSet<>();
             for (LabWork lw: CollectionManager.getCollection()) {
                 if (lw.getId() <= 0) throw new IncorrectFieldInputException();
+                idSet.add(lw.getId());
                 if (lw.getName().isBlank()) throw new IncorrectFieldInputException();
                 if (lw.getCoordinates() == null) throw new IncorrectFieldInputException();
                 if (lw.getCoordinates().getY() == null ||
@@ -78,6 +82,7 @@ public class FileManager {
                 if (lw.getDifficulty() == null) throw new IncorrectFieldInputException();
                 if (lw.getDiscipline() != null && lw.getDiscipline().getName().isBlank()) lw.setDiscipline(null);
             }
+            if (idSet.size() < CollectionManager.size()) throw new IncorrectFieldInputException();
             done = true;
         } catch (JAXBException e) {
             System.out.println("Ошибка чтения XML");
